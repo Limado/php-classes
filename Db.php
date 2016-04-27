@@ -1,13 +1,5 @@
 <?php
 /**
- * Traigo el config para evitar un include mas en cada script que necesite conexion a la db.
- * El archivo contiene los datos default para conexion a la base de datos.
- */
-//include_once ($_SERVER['DOCUMENT_ROOT'] . "/class/Config.php");
-// Hecho asi porque sino falla el importador ya que al no ser por web, no existe $_SERVER
-//include_once ('Config.php');
-
-/**
  * Clase para conexion a base de datos con Mysqli
  * Mejora realiazada modificacion del 25/03/2013 cambio de Mysql a Mysqli.
  * Fecha Creacion: 10/04/2012
