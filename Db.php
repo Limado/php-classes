@@ -263,7 +263,7 @@ class DB {
         $tabla = "<table $id >";
 
         for ($i = 0; $i < $columnas; $i += 1) {
-            $campo = mysqli_fetch_field($stmt, $i);
+            $campo = mysqli_fetch_field_direct($stmt, $i);
             $tabla .= '<th>' . $campo->name . '</th>';
         }
 
