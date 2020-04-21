@@ -8,7 +8,6 @@
  * @package GTE_DataBase
  */
 class DB {
-
     private $user;
     private $host;
     private $pass;
@@ -52,11 +51,9 @@ class DB {
      * @return link Devuelve un identificador de enlace de MySQL en caso de éxito o FALSE en caso de error.
      */
     public function __construct($host, $user, $pass) {
-
         $this->host = $host;
         $this->user = $user;
         $this->pass = $pass;
-
         return $this->connect();
     }
     /**
@@ -225,7 +222,6 @@ class DB {
                 if ($result = mysqli_store_result($this->link)) {
                     $dt = new data_table();
                     $dt->column_count(mysqli_field_count($this->link));
-
                     for ($i = 0; $i < $dt->column_count(); $i += 1) {
                         $campo = mysqli_fetch_field_direct($result, $i);
                         $dt->add_column($campo->name);
@@ -246,7 +242,41 @@ class DB {
         }
         return $this->data_set;
     }
+	 /**
+     * Convierte el stmt (Tabla MySql devuelta por un select) en un JSON.
+     * De comportamiento dinamico, no es necesario indicar nombres ni cantidad de columnas devueltas.
+     * @Param resource $stmt Es un resource devuelto por un mysql_query / execute
+     */
+	public function QueryToJSON($stmt, $id = false){
+        if (!$stmt)
+            return ("El parametro 1 debe ser un resource devuelto RunQuery()");
+        if ($id)
+            $id = "id='$id'";
+        if (!$columnas = mysqli_num_fields($stmt)) {
+            $this->print_errors(mysqli_error());
+        }
+
+		$rowcount = mysqli_num_rows($stmt);
+		$tabla = '[';
+		$i = 0;
+		while ($reg = mysqli_fetch_array($stmt)) {
+			$i = $i +1;
+			$tabla .= '{';
+            for ($c = 0; $c < $columnas; $c++) {
+				$campo = mysqli_fetch_field_direct($stmt, $c);
+				$tabla .= '"' . $campo->name . '":"' .$reg[$c] . '"';
+			if($c < $columnas-1){ $tabla .= ','; };	
+            }
+			if($i < $rowcount) {$tabla .= '},';}
+			else {$tabla .= '}';};
+			
+		}
+		$tabla .= ']';
+
+        return ($tabla);		
+	}	
     /**
+
      * Convierte el stmt (Tabla MySql devuelta por un select) en una tabla html.
      * De comportamiento dinamico, no es necesario indicar nombres ni cantidad de columnas devueltas.
      * @Param resource $stmt Es un resource devuelto por un mysql_query / execute
@@ -259,14 +289,11 @@ class DB {
         if (!$columnas = mysqli_num_fields($stmt)) {
             $this->print_errors(mysqli_error());
         }
-
         $tabla = "<table $id >";
-
         for ($i = 0; $i < $columnas; $i += 1) {
             $campo = mysqli_fetch_field_direct($stmt, $i);
             $tabla .= '<th>' . $campo->name . '</th>';
         }
-
         while ($reg = mysqli_fetch_array($stmt)) {
             $tabla = $tabla . "<tr>";
             for ($c = 0; $c < $columnas; $c++) {
@@ -274,9 +301,7 @@ class DB {
             }
             $tabla = $tabla . "</tr>";
         }
-
         $tabla.="</table>";
-
         return ($tabla);
     }
     /**
@@ -291,21 +316,14 @@ class DB {
         if (!$columnas = mysqli_num_fields($stmt)) {
             $this->print_errors(mysql_error());
         }
-
         $xml = new DOMDocument("1.0", "utf-8");
-
         $xml_OutData = $xml->createElement("OutData");
-
         while ($reg = mysqli_fetch_array($stmt)) {
-
             $xml_RowData = $xml->createElement("RowData");
-
             for ($i = 0; $i < $columnas; $i += 1) {
                 $campo = mysqli_fetch_field_direct($stmt, $i);
-
                 $xml_Campo = $xml->createElement($campo->name);
                 $xml_Campo->appendChild($xml->createTextNode(utf8_encode($reg[$i])));
-
                 $xml_RowData->appendChild($xml_Campo);
             }
             $xml_OutData->appendChild($xml_RowData);
@@ -381,7 +399,6 @@ class DB {
             }
             $this->NewLog(false);
         };
-
         $fp = fopen($directorio . $this->name . ".txt", "a+");
         fwrite($fp, "[" . date("Y-m-d H:i:s", time()) . "]\r\n" . utf8_encode($contenido) . "\r\n");
         fclose($fp);
@@ -422,7 +439,6 @@ class DB {
  * @package GTE_DataBase
  */
 class data_table {
-
     private $row_count = 0;
     private $column_count;
     private $column_names = array();
@@ -586,10 +602,8 @@ class data_table {
  * @package GTE_DataBase 
  */
 class data_set {
-
     private $data_set_table_count;
     private $data_set_table = array();
-
     /**
      * Devuelve la cantidad de data_tables del data_set.
      * @return int
